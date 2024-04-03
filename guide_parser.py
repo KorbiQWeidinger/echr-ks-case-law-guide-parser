@@ -11,9 +11,7 @@ def available_paragraphs(text: str):
     return i - 1
 
 
-def clean_paragraph(paragraph: str, i: int):
-    paragraph = paragraph.removeprefix(f"{i}.  ")
-
+def clean_paragraph(paragraph: str):
     pattern = r"\n\s*([IVXLCDM]+|[A-Z]|[a-u]|\d+)\.\s+"
     all_matches = re.findall(pattern, paragraph)
 
@@ -36,7 +34,7 @@ def extract_paragraph(i: int, text: str):
             print(text)
             raise Exception("Failed to split on", i + 1)
 
-    paragraph = clean_paragraph(split_on_par[0], i)
+    paragraph = clean_paragraph(split_on_par[0])
     continued_text = split_on_par[1]
 
     return paragraph, continued_text
@@ -62,10 +60,10 @@ class GuideParser:
 
     def __extract_paragraphs(self, text: str):
         if self.starting_string:
-            text = self.starting_string + text.split(self.starting_string, maxsplit=1)[1]
+            text = self.starting_string.replace("1. ", "") + text.split(self.starting_string, maxsplit=1)[1]
         else:
             text = text.split("HUDOC keywords", maxsplit=1)[1]
-            text = "\n1.  " + text.split("\n1.  ", maxsplit=1)[1]
+            text = text.split("\n1.  ", maxsplit=1)[1]
         
         text = text.split("List of cited cases")[0]
         return text
@@ -94,5 +92,5 @@ class GuideParser:
         for i in range(1, n):
             paragraph, text = extract_paragraph(i, text)
             paragraphs.append(paragraph)
-        paragraphs.append(clean_paragraph(text, n))
+        paragraphs.append(clean_paragraph(text))
         return paragraphs

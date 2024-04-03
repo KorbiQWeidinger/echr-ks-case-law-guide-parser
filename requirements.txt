@@ -1,0 +1,6 @@
+PyPDF2
+requests
+pydantic
+nltk
+pandas
+pdfminer.six

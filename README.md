@@ -1,4 +1,4 @@
-# ECHR-KS Case-Law Guides Parser
+# ECHR-QA: Case-Law Guides Parser
 
 Parser for ECHR case law guides.
 

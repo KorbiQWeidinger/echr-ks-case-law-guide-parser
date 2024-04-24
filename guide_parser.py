@@ -1,4 +1,5 @@
 import re
+import pandas as pd
 from pdfminer.high_level import extract_text
 from pydantic import BaseModel
 from utils.fetch_pdf import fetch_pdf_content
@@ -53,10 +54,11 @@ class GuideParsingMeta(BaseModel):
 
 
 class GuideParser:
-    def __init__(self, guide_id: str, starting_string: str | None = None, url: str = "https://ks.echr.coe.int/documents/d/echr-ks/"):
+    def __init__(self, guide_id: str, starting_string: str | None = None, url: str = "https://ks.echr.coe.int/documents/d/echr-ks/", remove_patterns: list[str] = []):
         self.guide_id = guide_id
         self.url = url + guide_id
         self.starting_string = starting_string
+        self.remove_patterns = remove_patterns
 
     def __extract_paragraphs(self, text: str):
         if self.starting_string:
@@ -69,10 +71,10 @@ class GuideParser:
         return text
 
     def __clean_paragraphs(self, text: str):
-        remove_patterns = [
+        self.remove_patterns.append(
             r"European Court of Human Rights\s+[\s\n]*\d+\/\d+[\s\n]+Last update: \d{2}\.\d{2}\.\d{4}[\s\n]*(.*?)\n"
-        ]
-        for pattern in remove_patterns:
+        )
+        for pattern in self.remove_patterns:
             text = re.sub(pattern, " ", text, flags=re.DOTALL)
         return text
 
@@ -94,3 +96,11 @@ class GuideParser:
             paragraphs.append(paragraph)
         paragraphs.append(clean_paragraph(text))
         return paragraphs
+
+    def to_csv(self):
+        paragraphs = self.parse()
+        df = pd.DataFrame(paragraphs, columns=['paragraph'], index=range(1, len(paragraphs)+1))
+        guide_ids = [self.guide_id] * len(paragraphs)
+        df['guide_id'] = guide_ids
+        df['paragraph_id'] = df.index
+        return df

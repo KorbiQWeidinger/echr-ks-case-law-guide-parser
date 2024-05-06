@@ -4,3 +4,5 @@ pydantic
 nltk
 pandas
 pdfminer.six
+requests
+beautifulsoup4

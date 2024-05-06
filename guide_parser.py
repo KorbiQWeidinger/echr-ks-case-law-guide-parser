@@ -7,7 +7,7 @@ from utils.fetch_pdf import fetch_pdf_content
 
 def available_paragraphs(text: str):
     i = 1
-    while f"{i}.  " in text:
+    while f"{i}." in text:
         i += 1
     return i - 1
 
